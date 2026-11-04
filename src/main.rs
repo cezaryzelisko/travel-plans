@@ -1,3 +1,6 @@
+mod domain;
+mod providers;
+
 use askama::Template;
 use axum::{
     Router,
@@ -5,12 +8,26 @@ use axum::{
     routing::get,
 };
 
+use crate::{
+    domain::country::Country,
+    providers::in_memory_countries_repository::InMemoryCountriesRepository,
+};
+
 #[derive(Template)]
 #[template(path = "index.html")]
-struct IndexTemplate {}
+struct IndexTemplate<'a> {
+    countries: &'a [Country],
+}
+
+impl<'a> IndexTemplate<'a> {
+    fn new(countries: &'a [Country]) -> Self {
+        IndexTemplate { countries }
+    }
+}
 
 async fn get_index_page() -> impl IntoResponse {
-    let template_result = IndexTemplate {}.render();
+    let countries_repository = InMemoryCountriesRepository::new();
+    let template_result = IndexTemplate::new(countries_repository.get_countries()).render();
 
     match template_result {
         Ok(template) => Html(template),

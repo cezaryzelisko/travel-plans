@@ -7,6 +7,12 @@
 <body>
     <h1>Travel Plans</h1>
     <p>Welcome to the Travel Plans app!</p>
+
+    <ul>
+        {% for country in countries %}
+        <li>{{ country.name }}</li>
+        {% endfor %}
+    </ul>
 </body>
 
 </html>
