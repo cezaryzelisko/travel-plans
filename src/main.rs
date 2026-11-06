@@ -22,7 +22,7 @@ struct IndexTemplate<'a> {
 
 impl<'a> IndexTemplate<'a> {
     fn new(countries: &'a [Country]) -> Self {
-        IndexTemplate { countries }
+        Self { countries }
     }
 }
 
