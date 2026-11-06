@@ -1,4 +1,9 @@
-use crate::domain::{country::Country, country_code::CountryCode};
+use async_trait::async_trait;
+
+use crate::{
+    domain::{country::Country, country_code::CountryCode},
+    repositories::{countries_repository::CountriesRepository, repository_error::RepositoryError},
+};
 
 pub struct InMemoryCountriesRepository {
     countries: Vec<Country>,
@@ -25,8 +30,9 @@ impl InMemoryCountriesRepository {
     }
 }
 
-impl InMemoryCountriesRepository {
-    pub fn get_countries(&self) -> &[Country] {
-        &self.countries
+#[async_trait]
+impl CountriesRepository for InMemoryCountriesRepository {
+    async fn all(&self) -> Result<Vec<Country>, RepositoryError> {
+        Ok(self.countries.clone())
     }
 }

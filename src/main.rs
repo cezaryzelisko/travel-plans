@@ -1,5 +1,6 @@
 mod domain;
 mod providers;
+mod repositories;
 
 use askama::Template;
 use axum::{
@@ -12,6 +13,7 @@ use tower_http::services::ServeDir;
 use crate::{
     domain::country::Country,
     providers::in_memory_countries_repository::InMemoryCountriesRepository,
+    repositories::countries_repository::CountriesRepository,
 };
 
 #[derive(Template)]
@@ -28,7 +30,13 @@ impl<'a> IndexTemplate<'a> {
 
 async fn get_index_page() -> impl IntoResponse {
     let countries_repository = InMemoryCountriesRepository::new();
-    let template_result = IndexTemplate::new(countries_repository.get_countries()).render();
+    let countries = match countries_repository.all().await {
+        Ok(result) => result,
+        Err(_) => {
+            return Html("Failed to get countries from store".to_string());
+        }
+    };
+    let template_result = IndexTemplate::new(&countries).render();
 
     match template_result {
         Ok(template) => Html(template),

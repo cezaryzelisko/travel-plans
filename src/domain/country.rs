@@ -1,5 +1,6 @@
 use crate::domain::country_code::CountryCode;
 
+#[derive(Debug, Clone)]
 pub struct Country {
     pub name: String,
     pub code: CountryCode,
