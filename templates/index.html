@@ -1,12 +1,20 @@
-<!DOCTYPE html>
+<html>
 
 <head>
     <title>Travel Plans</title>
+
+    <!-- jsVectorMap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/jsvectormap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+    <script src="/public/map.js" defer></script>
 </head>
 
 <body>
     <h1>Travel Plans</h1>
     <p>Welcome to the Travel Plans app!</p>
+
+    <div id="map"></div>
 
     <ul>
         {% for country in countries %}

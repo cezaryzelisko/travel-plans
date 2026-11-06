@@ -7,6 +7,7 @@ use axum::{
     response::{Html, IntoResponse},
     routing::get,
 };
+use tower_http::services::ServeDir;
 
 use crate::{
     domain::country::Country,
@@ -38,7 +39,9 @@ async fn get_index_page() -> impl IntoResponse {
 #[tokio::main]
 async fn main() {
     let address = "0.0.0.0:3000";
-    let app = Router::new().route("/", get(get_index_page));
+    let app = Router::new()
+        .route("/", get(get_index_page))
+        .nest_service("/public", ServeDir::new("public"));
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
     println!("App is running on: http://{}", address);
 
