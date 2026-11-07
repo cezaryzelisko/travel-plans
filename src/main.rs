@@ -2,9 +2,12 @@ mod domain;
 mod providers;
 mod repositories;
 
+use std::sync::Arc;
+
 use askama::Template;
 use axum::{
     Router,
+    extract::State,
     response::{Html, IntoResponse},
     routing::get,
 };
@@ -28,9 +31,21 @@ impl<'a> IndexTemplate<'a> {
     }
 }
 
-async fn get_index_page() -> impl IntoResponse {
-    let countries_repository = InMemoryCountriesRepository::new();
-    let countries = match countries_repository.all().await {
+#[derive(Clone)]
+struct AppState {
+    countries_repository: Arc<dyn CountriesRepository>,
+}
+
+impl AppState {
+    fn new(countries_repository: Arc<dyn CountriesRepository>) -> Self {
+        Self {
+            countries_repository,
+        }
+    }
+}
+
+async fn get_index_page(State(state): State<AppState>) -> impl IntoResponse {
+    let countries = match state.countries_repository.all().await {
         Ok(result) => result,
         Err(_) => {
             return Html("Failed to get countries from store".to_string());
@@ -47,11 +62,16 @@ async fn get_index_page() -> impl IntoResponse {
 #[tokio::main]
 async fn main() {
     let address = "0.0.0.0:3000";
+    let state = AppState::new(Arc::new(InMemoryCountriesRepository::new()));
+
     let app = Router::new()
         .route("/", get(get_index_page))
-        .nest_service("/public", ServeDir::new("public"));
+        .nest_service("/public", ServeDir::new("public"))
+        .with_state(state);
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
     println!("App is running on: http://{}", address);
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .await
+        .expect("Failed to bind to the address");
 }
