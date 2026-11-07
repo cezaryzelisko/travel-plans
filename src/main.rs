@@ -1,63 +1,19 @@
 mod domain;
+mod handlers;
+mod pages;
 mod providers;
 mod repositories;
+mod state;
 
 use std::sync::Arc;
 
-use askama::Template;
-use axum::{
-    Router,
-    extract::State,
-    response::{Html, IntoResponse},
-    routing::get,
-};
+use axum::{Router, routing::get};
 use tower_http::services::ServeDir;
 
 use crate::{
-    domain::country::Country,
-    providers::in_memory_countries_repository::InMemoryCountriesRepository,
-    repositories::countries_repository::CountriesRepository,
+    handlers::home::get_index_page,
+    providers::in_memory_countries_repository::InMemoryCountriesRepository, state::AppState,
 };
-
-#[derive(Template)]
-#[template(path = "index.html")]
-struct IndexTemplate<'a> {
-    countries: &'a [Country],
-}
-
-impl<'a> IndexTemplate<'a> {
-    fn new(countries: &'a [Country]) -> Self {
-        Self { countries }
-    }
-}
-
-#[derive(Clone)]
-struct AppState {
-    countries_repository: Arc<dyn CountriesRepository>,
-}
-
-impl AppState {
-    fn new(countries_repository: Arc<dyn CountriesRepository>) -> Self {
-        Self {
-            countries_repository,
-        }
-    }
-}
-
-async fn get_index_page(State(state): State<AppState>) -> impl IntoResponse {
-    let countries = match state.countries_repository.all().await {
-        Ok(result) => result,
-        Err(_) => {
-            return Html("Failed to get countries from store".to_string());
-        }
-    };
-    let template_result = IndexTemplate::new(&countries).render();
-
-    match template_result {
-        Ok(template) => Html(template),
-        Err(_) => Html("Failed to render template".to_string()),
-    }
-}
 
 #[tokio::main]
 async fn main() {
