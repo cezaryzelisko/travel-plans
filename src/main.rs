@@ -11,7 +11,7 @@ use axum::{Router, routing::get};
 use tower_http::services::ServeDir;
 
 use crate::{
-    handlers::home::get_index_page,
+    handlers::home::get_home_page,
     providers::in_memory_countries_repository::InMemoryCountriesRepository, state::AppState,
 };
 
@@ -21,13 +21,15 @@ async fn main() {
     let state = AppState::new(Arc::new(InMemoryCountriesRepository::new()));
 
     let app = Router::new()
-        .route("/", get(get_index_page))
+        .route("/", get(get_home_page))
         .nest_service("/public", ServeDir::new("public"))
         .with_state(state);
-    let listener = tokio::net::TcpListener::bind(address).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(address)
+        .await
+        .expect("Failed to bind to the address");
     println!("App is running on: http://{}", address);
 
     axum::serve(listener, app)
         .await
-        .expect("Failed to bind to the address");
+        .expect("Failed to serve the app");
 }

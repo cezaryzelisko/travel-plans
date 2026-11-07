@@ -3,7 +3,7 @@ use askama::Template;
 use crate::domain::country::Country;
 
 #[derive(Template)]
-#[template(path = "index.html")]
+#[template(path = "home.html")]
 pub struct HomeTemplate<'a> {
     countries: &'a [Country],
 }
