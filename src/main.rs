@@ -1,3 +1,4 @@
+mod app_error;
 mod domain;
 mod handlers;
 mod pages;

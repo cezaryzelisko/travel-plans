@@ -1,22 +1,11 @@
 use askama::Template;
-use axum::{
-    extract::State,
-    response::{Html, IntoResponse},
-};
+use axum::{extract::State, response::Html};
 
-use crate::{pages::home::HomeTemplate, state::AppState};
+use crate::{app_error::AppError, pages::home::HomeTemplate, state::AppState};
 
-pub async fn get_home_page(State(state): State<AppState>) -> impl IntoResponse {
-    let countries = match state.countries_repository.all().await {
-        Ok(result) => result,
-        Err(_) => {
-            return Html("Failed to get countries from store".to_string());
-        }
-    };
-    let template_result = HomeTemplate::new(&countries).render();
+pub async fn get_home_page(State(state): State<AppState>) -> Result<Html<String>, AppError> {
+    let countries = state.countries_repository.all().await?;
+    let template = HomeTemplate::new(&countries).render()?;
 
-    match template_result {
-        Ok(template) => Html(template),
-        Err(_) => Html("Failed to render template".to_string()),
-    }
+    Ok(Html(template))
 }
