@@ -26,3 +26,62 @@ pub enum CountryCodeError {
     #[error("invalid code format, only A-Z letters are accepted")]
     InvalidFormat,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn accepts_valid_uppercase_code() {
+        let result = CountryCode::parse("PL".to_string());
+        assert!(result.is_ok())
+    }
+
+    #[test]
+    fn accepts_valid_lowercase_code() {
+        let result = CountryCode::parse("pl".to_string());
+        assert!(result.is_ok())
+    }
+
+    #[test]
+    fn transforms_valid_lowercase_code_to_uppercase() {
+        let result = CountryCode::parse("pl".to_string());
+        assert_eq!(result.unwrap().0, "PL")
+    }
+
+    #[test]
+    fn rejects_code_longer_than_2_letters() {
+        let result = CountryCode::parse("ABC".to_string());
+        assert!(matches!(result, Err(CountryCodeError::InvalidLength(3))))
+    }
+
+    #[test]
+    fn rejects_code_shorter_than_2_letters() {
+        let result = CountryCode::parse("A".to_string());
+        assert!(matches!(result, Err(CountryCodeError::InvalidLength(1))))
+    }
+
+    #[test]
+    fn rejects_empty_code() {
+        let result = CountryCode::parse("".to_string());
+        assert!(matches!(result, Err(CountryCodeError::InvalidLength(0))))
+    }
+
+    #[test]
+    fn rejects_code_with_digit() {
+        let result = CountryCode::parse("A1".to_string());
+        assert!(matches!(result, Err(CountryCodeError::InvalidFormat)))
+    }
+
+    #[test]
+    fn rejects_code_with_symbol() {
+        let result = CountryCode::parse("A!".to_string());
+        assert!(matches!(result, Err(CountryCodeError::InvalidFormat)))
+    }
+
+    #[test]
+    fn rejects_code_with_non_ascii_letter() {
+        let result = CountryCode::parse("AĄ".to_string());
+        assert!(matches!(result, Err(CountryCodeError::InvalidFormat)))
+    }
+}
