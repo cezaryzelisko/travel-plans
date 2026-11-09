@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -5,27 +7,23 @@ use axum::{
 
 use crate::repositories::repository_error::RepositoryError;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum AppError {
-    Storage(RepositoryError),
-    Template(askama::Error),
-}
-
-impl From<RepositoryError> for AppError {
-    fn from(value: RepositoryError) -> Self {
-        Self::Storage(value)
-    }
-}
-
-impl From<askama::Error> for AppError {
-    fn from(value: askama::Error) -> Self {
-        Self::Template(value)
-    }
+    #[error("storage operation failed")]
+    Storage(#[from] RepositoryError),
+    #[error("failed to render the page template")]
+    Template(#[from] askama::Error),
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        eprintln!("Error: {self:?}");
+        let mut source = self.source();
+        eprintln!("error: {self}");
+
+        while let Some(src) = source {
+            source = src.source();
+            eprintln!("caused by: {src}");
+        }
 
         match self {
             Self::Storage(_) | Self::Template(_) => {
