@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct CountryCode(String);
 
@@ -16,6 +18,12 @@ impl CountryCode {
         code.make_ascii_uppercase();
 
         Ok(Self(code))
+    }
+}
+
+impl Display for CountryCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.0, f)
     }
 }
 
@@ -83,5 +91,11 @@ mod tests {
     fn rejects_code_with_non_ascii_letter() {
         let result = CountryCode::parse("AĄ".to_string());
         assert!(matches!(result, Err(CountryCodeError::InvalidFormat)))
+    }
+
+    #[test]
+    fn prints_two_letter_representation() {
+        let result = CountryCode::parse("pl".to_string());
+        assert_eq!(result.unwrap().to_string(), "PL")
     }
 }
