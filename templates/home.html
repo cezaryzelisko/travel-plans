@@ -1,4 +1,4 @@
-<html lang="en">
+<!DOCTYPE html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -9,6 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
     <script src="/public/map.js" defer></script>
+
+    <!-- app data -->
+    <script type="application/json" id="countries-list">{{ countries|json|safe }}</script>
 </head>
 
 <body>

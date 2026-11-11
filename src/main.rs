@@ -1,10 +1,9 @@
-mod app_error;
+mod api;
 mod domain;
-mod handlers;
-mod pages;
 mod providers;
 mod repositories;
 mod state;
+mod view;
 
 use std::sync::Arc;
 
@@ -12,7 +11,7 @@ use axum::{Router, routing::get};
 use tower_http::services::ServeDir;
 
 use crate::{
-    handlers::home::get_home_page,
+    api::handlers::home::get_home_page,
     providers::in_memory_countries_repository::InMemoryCountriesRepository, state::AppState,
 };
 
