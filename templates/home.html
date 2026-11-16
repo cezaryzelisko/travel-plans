@@ -11,6 +11,11 @@
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
     <script src="/public/map.js" defer></script>
 
+    <!-- HTMX -->
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.1/dist/htmx.min.js"
+        integrity="sha384-Qp9rdC8H7EqOoX+nR0P3RPG2Noji+qdwJlGpfzwQJsfOpp3sGwIdSP9xO3+UlEhn"
+        crossorigin="anonymous"></script>
+
     <!-- app data -->
     <script type="application/json" id="countries-list">{{ countries|json|safe }}</script>
 </head>
@@ -21,11 +26,10 @@
 
     <div id="map"></div>
 
-    <ul>
-        {% for country in countries %}
-        <li>{{ country.name }}</li>
-        {% endfor %}
-    </ul>
+    <dialog id="country-details-dialog">
+        <div id="country-details-dialog-content"></div>
+        <form method="dialog"><button>Close</button></form>
+    </dialog>
 </body>
 
 </html>

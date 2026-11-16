@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use async_trait::async_trait;
 
 use crate::{
@@ -6,26 +8,30 @@ use crate::{
 };
 
 pub struct InMemoryCountriesRepository {
-    countries: Vec<Country>,
+    countries: HashMap<CountryCode, Country>,
 }
 
 impl InMemoryCountriesRepository {
     pub fn new() -> Self {
+        let poland = Country::new(
+            "Poland".to_string(),
+            CountryCode::parse("PL".to_string()).expect("hardcoded version of repo"),
+        );
+        let spain = Country::new(
+            "Spain".to_string(),
+            CountryCode::parse("ES".to_string()).expect("hardcoded version of repo"),
+        );
+        let portugal = Country::new(
+            "Portugal".to_string(),
+            CountryCode::parse("PT".to_string()).expect("hardcoded version of repo"),
+        );
+
         Self {
-            countries: vec![
-                Country::new(
-                    "Poland".to_string(),
-                    CountryCode::parse("PL".to_string()).expect("hardcoded version of repo"),
-                ),
-                Country::new(
-                    "Spain".to_string(),
-                    CountryCode::parse("ES".to_string()).expect("hardcoded version of repo"),
-                ),
-                Country::new(
-                    "Portugal".to_string(),
-                    CountryCode::parse("PT".to_string()).expect("hardcoded version of repo"),
-                ),
-            ],
+            countries: HashMap::from([
+                (poland.code.clone(), poland),
+                (spain.code.clone(), spain),
+                (portugal.code.clone(), portugal),
+            ]),
         }
     }
 }
@@ -33,7 +39,14 @@ impl InMemoryCountriesRepository {
 #[async_trait]
 impl CountriesRepository for InMemoryCountriesRepository {
     async fn all(&self) -> Result<Vec<Country>, RepositoryError> {
-        Ok(self.countries.clone())
+        Ok(self.countries.values().cloned().collect())
+    }
+
+    async fn find_one_by_code(
+        &self,
+        code: &CountryCode,
+    ) -> Result<Option<Country>, RepositoryError> {
+        Ok(self.countries.get(code).cloned())
     }
 }
 

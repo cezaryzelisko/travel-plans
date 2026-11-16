@@ -7,6 +7,24 @@ const loadMap = () => {
                 fill: 'red',
             },
 
+        },
+        onRegionClick: (_, code) => {
+            htmx.ajax(
+                'GET',
+                `/countries/${code}`,
+                { target: '#country-details-dialog-content', swap: 'innerHTML' },
+            ).then(
+                () => {
+                    const dialog = document.getElementById('country-details-dialog');
+
+                    if (!dialog) {
+                        console.error('Unable to locate dialog');
+                        return;
+                    }
+
+                    dialog.showModal();
+                }
+            ).catch((error) => console.error(error));
         }
     });
 }

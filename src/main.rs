@@ -11,8 +11,9 @@ use axum::{Router, routing::get};
 use tower_http::services::ServeDir;
 
 use crate::{
-    api::handlers::home::get_home_page,
-    providers::in_memory_countries_repository::InMemoryCountriesRepository, state::AppState,
+    api::handlers::{country_details::get_country_details, home::get_home_page},
+    providers::in_memory_countries_repository::InMemoryCountriesRepository,
+    state::AppState,
 };
 
 #[tokio::main]
@@ -22,6 +23,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(get_home_page))
+        .route("/countries/{code}", get(get_country_details))
         .nest_service("/public", ServeDir::new("public"))
         .with_state(state);
     let listener = tokio::net::TcpListener::bind(address)
