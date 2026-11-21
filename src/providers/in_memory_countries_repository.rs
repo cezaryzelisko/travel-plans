@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    sync::{RwLock, RwLockReadGuard},
+};
 
 use async_trait::async_trait;
 
@@ -8,7 +11,7 @@ use crate::{
 };
 
 pub struct InMemoryCountriesRepository {
-    countries: HashMap<CountryCode, Country>,
+    countries: RwLock<HashMap<CountryCode, Country>>,
 }
 
 impl InMemoryCountriesRepository {
@@ -27,26 +30,34 @@ impl InMemoryCountriesRepository {
         );
 
         Self {
-            countries: HashMap::from([
+            countries: RwLock::new(HashMap::from([
                 (poland.code.clone(), poland),
                 (spain.code.clone(), spain),
                 (portugal.code.clone(), portugal),
-            ]),
+            ])),
         }
+    }
+
+    fn read_countries(
+        &self,
+    ) -> Result<RwLockReadGuard<'_, HashMap<CountryCode, Country>>, RepositoryError> {
+        self.countries
+            .read()
+            .map_err(|e| RepositoryError::UnknownState(e.to_string()))
     }
 }
 
 #[async_trait]
 impl CountriesRepository for InMemoryCountriesRepository {
     async fn all(&self) -> Result<Vec<Country>, RepositoryError> {
-        Ok(self.countries.values().cloned().collect())
+        Ok(self.read_countries()?.values().cloned().collect())
     }
 
     async fn find_one_by_code(
         &self,
         code: &CountryCode,
     ) -> Result<Option<Country>, RepositoryError> {
-        Ok(self.countries.get(code).cloned())
+        Ok(self.read_countries()?.get(code).cloned())
     }
 }
 

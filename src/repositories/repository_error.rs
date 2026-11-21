@@ -1,5 +1,5 @@
 #[derive(Debug, thiserror::Error)]
 pub enum RepositoryError {
-    #[error("cannot read data from the store")]
-    Read,
+    #[error("data store is in an unknown state: {0}")]
+    UnknownState(String),
 }
