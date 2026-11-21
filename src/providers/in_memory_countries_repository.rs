@@ -6,7 +6,7 @@ use std::{
 use async_trait::async_trait;
 
 use crate::{
-    domain::{country::Country, country_code::CountryCode},
+    domain::{country::Country, country_code::CountryCode, country_name::CountryName},
     repositories::{countries_repository::CountriesRepository, repository_error::RepositoryError},
 };
 
@@ -15,18 +15,20 @@ pub struct InMemoryCountriesRepository {
 }
 
 impl InMemoryCountriesRepository {
+    const REPO_PARSE_MESSAGE: &str = "hardcoded version of repo";
+
     pub fn new() -> Self {
         let poland = Country::new(
-            "Poland".to_string(),
-            CountryCode::parse("PL".to_string()).expect("hardcoded version of repo"),
+            CountryName::parse("Poland".to_string()).expect(Self::REPO_PARSE_MESSAGE),
+            CountryCode::parse("PL".to_string()).expect(Self::REPO_PARSE_MESSAGE),
         );
         let spain = Country::new(
-            "Spain".to_string(),
-            CountryCode::parse("ES".to_string()).expect("hardcoded version of repo"),
+            CountryName::parse("Spain".to_string()).expect(Self::REPO_PARSE_MESSAGE),
+            CountryCode::parse("ES".to_string()).expect(Self::REPO_PARSE_MESSAGE),
         );
         let portugal = Country::new(
-            "Portugal".to_string(),
-            CountryCode::parse("PT".to_string()).expect("hardcoded version of repo"),
+            CountryName::parse("Portugal".to_string()).expect(Self::REPO_PARSE_MESSAGE),
+            CountryCode::parse("PT".to_string()).expect(Self::REPO_PARSE_MESSAGE),
         );
 
         Self {
@@ -112,7 +114,10 @@ mod tests {
         let country_code = CountryCode::parse("it".to_string()).unwrap();
 
         let write_country = repository
-            .create(Country::new("Italy".to_string(), country_code.clone()))
+            .create(Country::new(
+                CountryName::parse("Italy".to_string()).unwrap(),
+                country_code.clone(),
+            ))
             .await
             .unwrap();
         let find_country = repository
@@ -131,12 +136,15 @@ mod tests {
         let country_code = CountryCode::parse("it".to_string()).unwrap();
 
         let write_country = repository
-            .create(Country::new("Italy".to_string(), country_code.clone()))
+            .create(Country::new(
+                CountryName::parse("Italy".to_string()).unwrap(),
+                country_code.clone(),
+            ))
             .await
             .unwrap();
         let duplicated_country_result = repository
             .create(Country::new(
-                "Country of Italy".to_string(),
+                CountryName::parse("Country of Italy".to_string()).unwrap(),
                 country_code.clone(),
             ))
             .await;

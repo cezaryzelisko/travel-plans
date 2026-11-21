@@ -11,7 +11,7 @@ pub struct CountryDto {
 impl From<&Country> for CountryDto {
     fn from(value: &Country) -> Self {
         Self {
-            name: value.name.clone(),
+            name: value.name.to_string(),
             code: value.code.to_string(),
         }
     }
