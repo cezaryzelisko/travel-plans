@@ -15,6 +15,8 @@ pub enum AppError {
     Template(#[from] askama::Error),
     #[error("invalid input provided")]
     InvalidInput(#[source] Box<dyn Error + Send + Sync>),
+    #[error("serialization failed")]
+    Serialization(#[from] serde_json::Error),
 }
 
 impl AppError {
@@ -37,7 +39,9 @@ impl IntoResponse for AppError {
                 format!("Entity with id {} already exists", id),
             )
                 .into_response(),
-            Self::Storage(RepositoryError::UnknownState(_)) | Self::Template(_) => {
+            Self::Storage(RepositoryError::UnknownState(_))
+            | Self::Template(_)
+            | Self::Serialization(_) => {
                 self.log_errors();
                 (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong").into_response()
             }

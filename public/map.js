@@ -54,11 +54,30 @@ const showCountries = (map, countriesData) => {
     map.setSelectedRegions(countriesData.map(country => country.code));
 }
 
+const registerListeners = (map) => {
+    if (!map) {
+        return;
+    }
+
+    document.addEventListener('countries_updated', (event) => {
+        if (!event.detail || !Array.isArray(event.detail)) {
+            console.error('Invalid event detail for CountriesUpdated event');
+            return;
+        }
+
+        map.setSelectedRegions([
+            ...map.getSelectedRegions(),
+            ...event.detail,
+        ]);
+    });
+}
+
 const init = () => {
     const map = loadMap();
     const countriesData = loadCountries();
 
     showCountries(map, countriesData);
+    registerListeners(map);
 };
 
 init();
