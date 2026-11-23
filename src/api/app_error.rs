@@ -5,9 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
-use crate::{
-    domain::country_code::CountryCodeError, repositories::repository_error::RepositoryError,
-};
+use crate::repositories::repository_error::RepositoryError;
 
 #[derive(Debug, thiserror::Error)]
 pub enum AppError {
@@ -16,7 +14,7 @@ pub enum AppError {
     #[error("failed to render the page template")]
     Template(#[from] askama::Error),
     #[error("invalid input provided")]
-    InvalidInput(#[source] CountryCodeError),
+    InvalidInput(#[source] Box<dyn Error + Send + Sync>),
     #[error("entity not found")]
     EntityNotFound(String),
 }
@@ -35,13 +33,18 @@ impl AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        match self {
-            Self::Storage(_) | Self::Template(_) => {
+        match &self {
+            Self::Storage(RepositoryError::AlreadyExists(id)) => (
+                StatusCode::CONFLICT,
+                format!("Entity with id {} already exists", id),
+            )
+                .into_response(),
+            Self::Storage(RepositoryError::UnknownState(_)) | Self::Template(_) => {
                 self.log_errors();
                 (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong").into_response()
             }
-            Self::InvalidInput(country_code_error) => {
-                let message = format!("Provided invalid input: {}", country_code_error);
+            Self::InvalidInput(invalid_input_error) => {
+                let message = format!("Provided invalid input: {}", invalid_input_error);
                 (StatusCode::BAD_REQUEST, message).into_response()
             }
             Self::EntityNotFound(id) => (

@@ -7,11 +7,16 @@ mod view;
 
 use std::sync::Arc;
 
-use axum::{Router, routing::get};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 use tower_http::services::ServeDir;
 
 use crate::{
-    api::handlers::{country_details::get_country_details, home::get_home_page},
+    api::handlers::{
+        country_creation::create_country, country_details::get_country_details, home::get_home_page,
+    },
     providers::in_memory_countries_repository::InMemoryCountriesRepository,
     state::AppState,
 };
@@ -24,6 +29,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(get_home_page))
         .route("/countries/{code}", get(get_country_details))
+        .route("/countries", post(create_country))
         .nest_service("/public", ServeDir::new("public"))
         .with_state(state);
     let listener = tokio::net::TcpListener::bind(address)
