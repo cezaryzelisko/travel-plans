@@ -8,10 +8,11 @@ const loadMap = () => {
             },
 
         },
-        onRegionClick: (_, code) => {
+        onRegionClick: function (_, code) {
+            const name = encodeURIComponent(this.regions[code]?.config.name || "");
             htmx.ajax(
                 'GET',
-                `/countries/${code}`,
+                `/countries/${code}?name=${name}`,
                 { target: '#country-details-dialog-content', swap: 'innerHTML' },
             ).then(
                 () => {

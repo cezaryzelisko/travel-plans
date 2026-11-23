@@ -1,0 +1,14 @@
+<h2>{{ operation }} country</h2>
+
+<form hx-post="/countries" hx-target="#country-details-dialog-content" hx-swap="innerHTML">
+    <label>
+        Code
+        <input type="text" readonly name="code" value="{{ country_code }}">
+    </label>
+    <label>
+        Name
+        <input type="text" name="name" required value="{{ country_name }}">
+    </label>
+
+    <button type="submit">Save</button>
+</form>

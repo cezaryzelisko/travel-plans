@@ -15,8 +15,6 @@ pub enum AppError {
     Template(#[from] askama::Error),
     #[error("invalid input provided")]
     InvalidInput(#[source] Box<dyn Error + Send + Sync>),
-    #[error("entity not found")]
-    EntityNotFound(String),
 }
 
 impl AppError {
@@ -47,11 +45,6 @@ impl IntoResponse for AppError {
                 let message = format!("Provided invalid input: {}", invalid_input_error);
                 (StatusCode::BAD_REQUEST, message).into_response()
             }
-            Self::EntityNotFound(id) => (
-                StatusCode::NOT_FOUND,
-                format!("Entity identified by {} not found", id),
-            )
-                .into_response(),
         }
     }
 }
