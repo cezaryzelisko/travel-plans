@@ -19,7 +19,7 @@ pub async fn create_country(
         CountryName::parse(form.name).map_err(|e| AppError::InvalidInput(e.into()))?;
     let country_code =
         CountryCode::parse(form.code).map_err(|e| AppError::InvalidInput(e.into()))?;
-    let country = Country::new(country_name, country_code);
+    let country = Country::new(country_name, country_code, None, None);
     let country = state.countries_repository.create(country).await?;
     let template = CountryDetailsTemplate::new(&country).render()?;
     let headers = [(

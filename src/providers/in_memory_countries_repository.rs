@@ -21,14 +21,20 @@ impl InMemoryCountriesRepository {
         let poland = Country::new(
             CountryName::parse("Poland".to_string()).expect(Self::REPO_PARSE_MESSAGE),
             CountryCode::parse("PL".to_string()).expect(Self::REPO_PARSE_MESSAGE),
+            None,
+            None,
         );
         let spain = Country::new(
             CountryName::parse("Spain".to_string()).expect(Self::REPO_PARSE_MESSAGE),
             CountryCode::parse("ES".to_string()).expect(Self::REPO_PARSE_MESSAGE),
+            None,
+            None,
         );
         let portugal = Country::new(
             CountryName::parse("Portugal".to_string()).expect(Self::REPO_PARSE_MESSAGE),
             CountryCode::parse("PT".to_string()).expect(Self::REPO_PARSE_MESSAGE),
+            None,
+            None,
         );
 
         Self {
@@ -117,6 +123,8 @@ mod tests {
             .create(Country::new(
                 CountryName::parse("Italy".to_string()).unwrap(),
                 country_code.clone(),
+                None,
+                None,
             ))
             .await
             .unwrap();
@@ -139,6 +147,8 @@ mod tests {
             .create(Country::new(
                 CountryName::parse("Italy".to_string()).unwrap(),
                 country_code.clone(),
+                None,
+                None,
             ))
             .await
             .unwrap();
@@ -146,6 +156,8 @@ mod tests {
             .create(Country::new(
                 CountryName::parse("Country of Italy".to_string()).unwrap(),
                 country_code.clone(),
+                None,
+                None,
             ))
             .await;
         let find_country = repository
