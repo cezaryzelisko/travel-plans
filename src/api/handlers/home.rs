@@ -5,7 +5,8 @@ use crate::{api::app_error::AppError, state::AppState, view::pages::home::HomeTe
 
 pub async fn get_home_page(State(state): State<AppState>) -> Result<Html<String>, AppError> {
     let countries = state.countries_repository.all().await?;
-    let template = HomeTemplate::new(&countries).render()?;
+    let tags = state.tags_repository.all().await?;
+    let template = HomeTemplate::new(&countries, &tags).render()?;
 
     Ok(Html(template))
 }

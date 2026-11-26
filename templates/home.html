@@ -24,6 +24,12 @@
     <h1>Travel Plans</h1>
     <p>Welcome to the Travel Plans app!</p>
 
+    <ul>
+        {% for tag in tags %}
+        <li style="background-color: {{ tag.color }};">{{ tag.label }}</li>
+        {% endfor %}
+    </ul>
+
     <div id="map"></div>
 
     <dialog id="country-details-dialog">

@@ -17,14 +17,20 @@ use crate::{
     api::handlers::{
         country_creation::create_country, country_details::get_country_details, home::get_home_page,
     },
-    providers::in_memory_countries_repository::InMemoryCountriesRepository,
+    providers::{
+        in_memory_countries_repository::InMemoryCountriesRepository,
+        in_memory_tags_repository::InMemoryTagsRepository,
+    },
     state::AppState,
 };
 
 #[tokio::main]
 async fn main() {
     let address = "0.0.0.0:3000";
-    let state = AppState::new(Arc::new(InMemoryCountriesRepository::new()));
+    let state = AppState::new(
+        Arc::new(InMemoryCountriesRepository::new()),
+        Arc::new(InMemoryTagsRepository::new()),
+    );
 
     let app = Router::new()
         .route("/", get(get_home_page))

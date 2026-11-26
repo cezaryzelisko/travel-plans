@@ -4,4 +4,9 @@
 
 <ul>
     <li>Code: {{ country.code }}</li>
+    <ul>
+        {% for tag in country.tags %}
+        <li style="background-color: {{ tag.color }};">{{ tag.label }}</li>
+        {% endfor %}
+    </ul>
 </ul>
