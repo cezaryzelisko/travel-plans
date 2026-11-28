@@ -1,5 +1,6 @@
 use askama::Template;
-use axum::{Form, extract::State, http::StatusCode, response::Html};
+use axum::{extract::State, http::StatusCode, response::Html};
+use axum_extra::extract::Form;
 
 use crate::{
     api::app_error::AppError,
@@ -19,8 +20,10 @@ pub async fn create_country(
         CountryName::parse(form.name).map_err(|e| AppError::InvalidInput(e.into()))?;
     let country_code =
         CountryCode::parse(form.code).map_err(|e| AppError::InvalidInput(e.into()))?;
-    let raw_tags: Vec<String> = form.tags.split(',').map(|tag| tag.to_string()).collect();
-    let tags = state.tags_repository.find_many_by_labels(&raw_tags).await?;
+    let tags = state
+        .tags_repository
+        .find_many_by_labels(&form.tags)
+        .await?;
     let country = Country::new(country_name, country_code, None, Some(tags));
     let country = state.countries_repository.create(country).await?;
     let template = CountryDetailsTemplate::new(&country).render()?;

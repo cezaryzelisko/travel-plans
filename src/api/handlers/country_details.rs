@@ -10,7 +10,7 @@ use crate::{
     domain::country_code::CountryCode,
     state::AppState,
     view::{
-        dtos::country_query_dto::CountryQueryDto,
+        dtos::{country_query_dto::CountryQueryDto, tag_dto::TagDto},
         fragments::{country_details::CountryDetailsTemplate, country_form::CountryFormTemplate},
     },
 };
@@ -30,10 +30,17 @@ pub async fn get_country_details(
     let (status, template) = match country {
         Some(c) => (StatusCode::OK, CountryDetailsTemplate::new(&c).render()?),
         None => {
+            let tags = state
+                .tags_repository
+                .all()
+                .await?
+                .iter()
+                .map(TagDto::from)
+                .collect();
             let name = query.name.unwrap_or_default();
             (
                 StatusCode::NOT_FOUND,
-                CountryFormTemplate::new("Create", parsed_code.to_string(), name).render()?,
+                CountryFormTemplate::new("Create", parsed_code.to_string(), name, tags).render()?,
             )
         }
     };

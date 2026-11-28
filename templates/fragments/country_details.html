@@ -4,6 +4,7 @@
 
 <ul>
     <li>Code: {{ country.code }}</li>
+    <li>Visited: {% if country.is_visited %} true {% else %} false {% endif %}</li>
     <ul>
         {% for tag in country.tags %}
         <li style="background-color: {{ tag.color }};">{{ tag.label }}</li>

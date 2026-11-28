@@ -4,5 +4,6 @@ use serde::Deserialize;
 pub struct CountryCreateDto {
     pub name: String,
     pub code: String,
-    pub tags: String,
+    #[serde(default)]
+    pub tags: Vec<String>,
 }

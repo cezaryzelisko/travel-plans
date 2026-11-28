@@ -9,10 +9,15 @@
         Name
         <input type="text" name="name" required value="{{ country_name }}">
     </label>
-    <label>
-        Tags
-        <input type="text" name="tags">
-    </label>
+    <fieldset>
+        <legend>Tags</legend>
+        {% for tag in tags %}
+        <label>
+            <input type="checkbox" name="tags" value="{{ tag.label }}">
+            {{ tag.label }}
+        </label>
+        {% endfor %}
+    </fieldset>
 
     <button type="submit">Save</button>
 </form>

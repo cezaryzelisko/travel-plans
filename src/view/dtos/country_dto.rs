@@ -6,6 +6,7 @@ use crate::{domain::country::Country, view::dtos::tag_dto::TagDto};
 pub struct CountryDto {
     pub name: String,
     pub code: String,
+    pub is_visited: bool,
     pub tags: Vec<TagDto>,
 }
 
@@ -14,6 +15,7 @@ impl From<&Country> for CountryDto {
         Self {
             name: value.name.to_string(),
             code: value.code.to_string(),
+            is_visited: value.is_visited,
             tags: value.tags.iter().map(TagDto::from).collect(),
         }
     }
